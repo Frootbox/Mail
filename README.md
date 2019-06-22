@@ -1,2 +1,2 @@
-# Debug
+# Mail
 General Purpose Mail Library
