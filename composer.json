@@ -1,0 +1,19 @@
+{
+    "name": "frootbox/debug",
+    "description": "Frootbox Mail Library",
+    "support": {
+        "docs": "",
+        "email": "jan.habbo.bruening@gmail.com"
+    },
+    "version":	"0.0.1", 
+    "authors": [
+        {
+            "name": "Jan Habbo Brüning",
+            "email": "jan.habbo.bruening@gmail.com"
+        }
+    ],
+    "autoload": {
+    	"psr-4": { "Frootbox\\Mail\\": "src/" },
+    	"files": ["src/shortcuts.php"]
+    }
+}
