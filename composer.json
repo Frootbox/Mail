@@ -11,6 +11,9 @@
             "email": "jan.habbo.bruening@gmail.com"
         }
     ],
+    "require": {
+        "phpmailer/phpmailer": "6.6.*"
+    },
     "autoload": {
     	"psr-4": { "Frootbox\\Mail\\": "src/" }
     }
