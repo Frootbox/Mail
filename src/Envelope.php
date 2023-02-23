@@ -10,7 +10,7 @@ class Envelope
     protected $subject = null;
     protected $to = [];
     protected $bcc = [];
-    protected $replyTo = null;
+    protected ?\Frootbox\Mail\Recipient $replyTo = null;
     protected $bodyHtml = null;
     protected $attachments = [];
 
@@ -44,6 +44,16 @@ class Envelope
     public function clearBcc(): void
     {
         $this->bcc = [];
+    }
+
+    /**
+     * Clear reply to
+     *
+     * @return void
+     */
+    public function clearReplyTo(): void
+    {
+        $this->replyTo = null;
     }
 
     /**
