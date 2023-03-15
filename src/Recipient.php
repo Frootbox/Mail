@@ -20,6 +20,22 @@ class Recipient
     }
 
     /**
+     * Convert recipient to string
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        $string = '<' . $this->getAddress() . '>';
+
+        if (!empty($this->getName())) {
+            $string = $this->getName() . ' ' . $string;
+        }
+
+        return $string;
+    }
+
+    /**
      *
      */
     public function getAddress(): string
