@@ -7,8 +7,8 @@ namespace Frootbox\Mail\Transports;
 
 abstract class AbstractTransport implements \Frootbox\Mail\Transports\Interfaces\TransportInterface
 {
-    protected $fromAddress = null;
-    protected $fromName = null;
+    protected ?string $fromAddress = null;
+    protected ?string $fromName = null;
 
     /**
      *

@@ -7,12 +7,12 @@ namespace Frootbox\Mail;
 
 class Envelope
 {
-    protected $subject = null;
-    protected $to = [];
-    protected $bcc = [];
+    protected ?string $subject = null;
+    protected array $to = [];
+    protected array $bcc = [];
     protected ?\Frootbox\Mail\Recipient $replyTo = null;
-    protected $bodyHtml = null;
-    protected $attachments = [];
+    protected ?string $bodyHtml = null;
+    protected array $attachments = [];
 
     /**
      *
@@ -115,6 +115,14 @@ class Envelope
     /**
      *
      */
+    public function getTo(): array
+    {
+        return $this->to;
+    }
+
+    /**
+     *
+     */
     public function setBodyHtml(string $html): void
     {
         $this->bodyHtml = $html;
@@ -139,5 +147,16 @@ class Envelope
     public function setSubject(string $subject): void
     {
         $this->subject = $subject;
+    }
+
+    /**
+     * Replace array of recipients
+     *
+     * @param array $to
+     * @return void
+     */
+    public function setTo(array $to): void
+    {
+        $this->to = $to;
     }
 }

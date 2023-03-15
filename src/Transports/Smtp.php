@@ -88,9 +88,8 @@ class Smtp extends AbstractTransport
             $this->mailer->isHTML(true);
         }
 
-        $this->mailer->setFrom($this->getFromAddress(), $this->getFromName());
+        $this->mailer->setFrom($this->getFromAddress(), $this->getFromName(), false);
         $this->mailer->Subject = $envelope->getSubject();
-
 
         if (!empty($envelope->getReplyTo())) {
             $this->mailer->addReplyTo($envelope->getReplyTo()->getAddress());
