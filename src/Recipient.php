@@ -34,4 +34,15 @@ class Recipient
     {
         return $this->name;
     }
+
+    /**
+     * Set recipients address
+     *
+     * @param string $address
+     * @return void
+     */
+    public function setAddress(string $address): void
+    {
+        $this->address = $address;
+    }
 }
