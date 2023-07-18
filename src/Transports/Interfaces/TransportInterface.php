@@ -11,7 +11,7 @@ interface TransportInterface
      * @param \Frootbox\Mail\Envelope $envelope
      * @return void
      */
-    public function send(\Frootbox\Mail\Envelope $envelope): void;
+    public function send(\Frootbox\Mail\Envelope $envelope, array $parameters = []): void;
 
     /**
      *
