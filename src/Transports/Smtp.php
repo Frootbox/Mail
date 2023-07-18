@@ -21,7 +21,7 @@ class Smtp extends AbstractTransport
     /**
      *
      */
-    public function send(\Frootbox\Mail\Envelope $envelope): void
+    public function send(\Frootbox\Mail\Envelope $envelope, array $parameters = []): void
     {
         if (!empty($this->overrideSettings)) {
 
@@ -90,6 +90,41 @@ class Smtp extends AbstractTransport
 
         $this->mailer->setFrom($this->getFromAddress(), $this->getFromName(), false);
         $this->mailer->Subject = $envelope->getSubject();
+
+        if (!empty($parameters['inlineImages'])) {
+
+            $html = $envelope->getBodyHtml();
+
+            preg_match_all('#<img(.*?)src="(.*?)"(.*?)/>#', $html, $matches);
+
+            $loop = 1;
+
+            foreach ($matches[0] as $index => $tagline) {
+
+                $source = file_get_contents($matches[2][$index], false, stream_context_create(array(
+                    "ssl"=>array(
+                        "verify_peer"=>false,
+                        "verify_peer_name"=>false,
+                    ),
+                )));
+
+                $tempFile = tempnam(sys_get_temp_dir(), '_mailinline_image');
+
+                $handle = fopen($tempFile, "w");
+                fwrite($handle, $source);
+                fclose($handle);
+
+                $this->mailer->addEmbeddedImage($tempFile, 'image-' . $loop, basename($matches[2][$index]));
+
+                $newTagline = str_replace($matches[2][$index], 'cid:image-' . $loop, $tagline);
+
+                $html = str_replace($tagline, $newTagline, $html);
+
+                ++$loop;
+            }
+
+            $envelope->setBodyHtml($html);
+        }
 
         if (!empty($envelope->getReplyTo())) {
             $this->mailer->addReplyTo($envelope->getReplyTo()->getAddress());

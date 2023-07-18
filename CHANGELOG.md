@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1] - 2023-07-18
 
+### Changed
+
+- Added optional parameters when sending envelopes.
+
 ### Added
 
 - Added changelog.
 - Added mail transport for localhost.
+- Added option for inlining images when sending envelopes.
