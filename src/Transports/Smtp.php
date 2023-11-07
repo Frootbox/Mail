@@ -95,7 +95,7 @@ class Smtp extends AbstractTransport
 
             $html = $envelope->getBodyHtml();
 
-            preg_match_all('#<img(.*?)src="(.*?)"(.*?)/>#', $html, $matches);
+            preg_match_all('#<img(.*?)src="(.*?)"(.*?)>#', $html, $matches);
 
             $loop = 1;
 
