@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2023-11-28
+
+### Fixed
+
+- Improved network stability by changing from ```file_get_contents``` to ```curl``` when inlining images.
+
+### Changed
+
+- Updated dependencies.
+
+## [0.1.1] - 2023-11-07
+
+### Fixed
+
+- Improve html5 compatibility when inlining images.
+
 ## [0.1] - 2023-07-18
 
 ### Changed

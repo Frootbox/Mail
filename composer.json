@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "phpmailer/phpmailer": "6.6.*"
+        "phpmailer/phpmailer": "6.6.*",
+        "ext-curl": "*"
     },
     "autoload": {
     	"psr-4": { "Frootbox\\Mail\\": "src/" }

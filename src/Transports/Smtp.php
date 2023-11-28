@@ -11,7 +11,8 @@ class Smtp extends AbstractTransport
     protected $overrideSettings = [];
 
     /**
-     *
+     * @param array $settings
+     * @return void
      */
     public function setOverrideSettings(array $settings): void
     {
@@ -19,7 +20,10 @@ class Smtp extends AbstractTransport
     }
 
     /**
-     *
+     * @param \Frootbox\Mail\Envelope $envelope
+     * @param array $parameters
+     * @return void
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     public function send(\Frootbox\Mail\Envelope $envelope, array $parameters = []): void
     {
@@ -101,19 +105,28 @@ class Smtp extends AbstractTransport
 
             foreach ($matches[0] as $index => $tagline) {
 
-                $source = file_get_contents($matches[2][$index], false, stream_context_create(array(
-                    "ssl"=>array(
-                        "verify_peer"=>false,
-                        "verify_peer_name"=>false,
-                    ),
-                )));
+                // Skip already inlined images
+                if (str_starts_with($matches[2][$index], 'cid:')) {
+                    continue;
+                }
 
+                // Fetch source of image
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $matches[2][$index]);
+                curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                $source = curl_exec ($ch);
+                curl_close ($ch);
+
+                // Create temporary file for image
                 $tempFile = tempnam(sys_get_temp_dir(), '_mailinline_image');
 
                 $handle = fopen($tempFile, "w");
                 fwrite($handle, $source);
                 fclose($handle);
 
+                // Add image file to inliner
                 $this->mailer->addEmbeddedImage($tempFile, 'image-' . $loop, basename($matches[2][$index]));
 
                 $newTagline = str_replace($matches[2][$index], 'cid:image-' . $loop, $tagline);
