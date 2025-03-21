@@ -148,7 +148,11 @@ class Smtp extends AbstractTransport
 
         $this->mailer->Body = $envelope->getBodyHtml();
 
-        $this->mailer->clearAddresses();
+        // Clear attachments
+        $this->mailer->clearAttachments();
+        
+        // Clear recipients
+        $this->mailer->clearAllRecipients();
 
         $def = error_reporting();
         error_reporting(E_ERROR | E_WARNING | E_PARSE);
