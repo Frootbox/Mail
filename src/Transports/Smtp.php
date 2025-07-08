@@ -82,6 +82,7 @@ class Smtp extends AbstractTransport
                     'allow_self_signed' => true,
                 ),
             );
+            $this->mailer->XMailer = null;
 
             // Debug mode is optional
             if (!empty($this->config->get('mail.smtp.debug'))) {
