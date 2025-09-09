@@ -94,7 +94,13 @@ class Smtp extends AbstractTransport
             $this->mailer->isHTML(true);
         }
 
+        // Clear attachments
+        $this->mailer->clearAttachments();
+
+        // Set from
         $this->mailer->setFrom($this->getFromAddress(), $this->getFromName(), false);
+
+        // Set subject
         $this->mailer->Subject = $envelope->getSubject();
 
         if (!empty($parameters['inlineImages'])) {
@@ -150,9 +156,6 @@ class Smtp extends AbstractTransport
 
         $this->mailer->Body = $envelope->getBodyHtml();
 
-        // Clear attachments
-        $this->mailer->clearAttachments();
-        
         // Clear recipients
         $this->mailer->clearAllRecipients();
 
