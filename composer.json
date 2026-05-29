@@ -1,6 +1,7 @@
 {
     "name": "frootbox/mail",
     "description": "Frootbox Mail Library",
+    "license": "GPL-3.0-only",
     "support": {
         "email": "jan.habbo.bruening@gmail.com"
     },
@@ -12,6 +13,7 @@
     ],
     "require": {
         "php": ">=8.0",
+        "frootbox/config": "^0.0.9 || ^1.0",
         "phpmailer/phpmailer": "6.6.*",
         "ext-curl": "*"
     },
