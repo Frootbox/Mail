@@ -103,79 +103,106 @@ class Smtp extends AbstractTransport
         // Set subject
         $this->mailer->Subject = $envelope->getSubject();
 
-        if (!empty($parameters['inlineImages'])) {
+        $html = $envelope->getBodyHtml();
+        $tempFiles = [];
 
-            $html = $envelope->getBodyHtml();
+        try {
+            if (!empty($parameters['inlineImages']) && $html !== null) {
 
-            preg_match_all('#<img(.*?)src="(.*?)"(.*?)>#', $html, $matches);
 
-            $loop = 1;
+                preg_match_all('#<img(.*?)src="(.*?)"(.*?)>#', $html, $matches);
 
-            foreach ($matches[0] as $index => $tagline) {
+                $loop = 1;
 
-                // Skip already inlined images
-                if (str_starts_with($matches[2][$index], 'cid:')) {
-                    continue;
+                foreach ($matches[0] as $index => $tagline) {
+
+                    // Skip already inlined images
+                    if (str_starts_with($matches[2][$index], 'cid:')) {
+                        continue;
+                    }
+
+                    // Fetch source of image
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $matches[2][$index]);
+                    curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    $source = curl_exec ($ch);
+                    curl_close ($ch);
+
+                    if ($source === false) {
+                        continue;
+                    }
+
+                    // Create temporary file for image
+                    $tempFile = tempnam(sys_get_temp_dir(), '_mailinline_image');
+
+                    if ($tempFile === false) {
+                        continue;
+                    }
+
+                    $handle = fopen($tempFile, "w");
+
+                    if ($handle === false) {
+                        unlink($tempFile);
+                        continue;
+                    }
+
+                    fwrite($handle, $source);
+                    fclose($handle);
+                    $tempFiles[] = $tempFile;
+
+                    // Add image file to inliner
+                    $this->mailer->addEmbeddedImage($tempFile, 'image-' . $loop, basename($matches[2][$index]));
+
+                    $newTagline = str_replace($matches[2][$index], 'cid:image-' . $loop, $tagline);
+
+                    $html = str_replace($tagline, $newTagline, $html);
+
+                    ++$loop;
                 }
-
-                // Fetch source of image
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $matches[2][$index]);
-                curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                $source = curl_exec ($ch);
-                curl_close ($ch);
-
-                // Create temporary file for image
-                $tempFile = tempnam(sys_get_temp_dir(), '_mailinline_image');
-
-                $handle = fopen($tempFile, "w");
-                fwrite($handle, $source);
-                fclose($handle);
-
-                // Add image file to inliner
-                $this->mailer->addEmbeddedImage($tempFile, 'image-' . $loop, basename($matches[2][$index]));
-
-                $newTagline = str_replace($matches[2][$index], 'cid:image-' . $loop, $tagline);
-
-                $html = str_replace($tagline, $newTagline, $html);
-
-                ++$loop;
             }
 
-            $envelope->setBodyHtml($html);
+            if (!empty($envelope->getReplyTo())) {
+                $this->mailer->addReplyTo($envelope->getReplyTo()->getAddress(), $envelope->getReplyTo()->getName() ?? '');
+            }
+            else {
+                $this->mailer->clearReplyTos();
+            }
+
+            $this->mailer->Body = $html;
+
+            // Clear recipients
+            $this->mailer->clearAllRecipients();
+
+            $def = error_reporting();
+            error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+            try {
+                foreach ($envelope->getRecipients() as $recipient) {
+                    $this->mailer->addAddress($recipient->getAddress(), $recipient->getName());
+                }
+
+                foreach ($envelope->getBcc() as $recipient) {
+                    $this->mailer->addBcc($recipient->getAddress(), $recipient->getName());
+                }
+            }
+            finally {
+                error_reporting($def);
+            }
+
+            foreach ($envelope->getAttachments() as $attachment) {
+                $this->mailer->addAttachment($attachment->getPath(), $attachment->getName());
+            }
+
+            $this->mailer->send();
         }
-
-        if (!empty($envelope->getReplyTo())) {
-            $this->mailer->addReplyTo($envelope->getReplyTo()->getAddress());
+        finally {
+            foreach ($tempFiles as $tempFile) {
+                if (is_file($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
         }
-        else {
-            $this->mailer->clearReplyTos();
-        }
-
-        $this->mailer->Body = $envelope->getBodyHtml();
-
-        // Clear recipients
-        $this->mailer->clearAllRecipients();
-
-        $def = error_reporting();
-        error_reporting(E_ERROR | E_WARNING | E_PARSE);
-
-        foreach ($envelope->getRecipients() as $recipient) {
-            $this->mailer->addAddress($recipient->getAddress(), $recipient->getName());
-        }
-
-        foreach ($envelope->getBcc() as $recipient) {
-            $this->mailer->addBcc($recipient->getAddress(), $recipient->getName());
-        }
-
-        error_reporting($def);
-
-        foreach ($envelope->getAttachments() as $attachment) {
-            $this->mailer->addAttachment($attachment->getPath(), $attachment->getName());
-        }
-
-        $this->mailer->send();
     }
 }

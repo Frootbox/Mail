@@ -21,10 +21,6 @@ class Localhost extends AbstractTransport
             $this->mailer->CharSet = "utf-8";
             $this->mailer->Encoding = 'base64';
 
-            ini_set('sendmail_from', $this->config->get('mail.defaults.from.address'));
-
-            $this->mailer->setFrom($this->config->get('mail.defaults.from.address'), $this->config->get('mail.defaults.from.name'), false);
-
             // Debug mode is optional
             if (!empty($this->config->get('mail.smtp.debug'))) {
                 // $this->mailer->SMTPDebug  = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
@@ -33,11 +29,17 @@ class Localhost extends AbstractTransport
 
             // Content
             $this->mailer->isHTML(true);
-            $this->mailer->Subject = $envelope->getSubject();
         }
 
+        ini_set('sendmail_from', $this->getFromAddress());
+
+        $this->mailer->clearAllRecipients();
+        $this->mailer->clearAttachments();
+        $this->mailer->setFrom($this->getFromAddress(), $this->getFromName(), false);
+        $this->mailer->Subject = $envelope->getSubject();
+
         if (!empty($envelope->getReplyTo())) {
-            $this->mailer->AddReplyTo($envelope->getReplyTo()->getAddress());
+            $this->mailer->addReplyTo($envelope->getReplyTo()->getAddress(), $envelope->getReplyTo()->getName() ?? '');
         }
         else {
             $this->mailer->clearReplyTos();
@@ -45,10 +47,12 @@ class Localhost extends AbstractTransport
 
         $this->mailer->Body = $envelope->getBodyHtml();
 
-        $this->mailer->clearAddresses();
-
         foreach ($envelope->getRecipients() as $recipient) {
             $this->mailer->addAddress($recipient->getAddress(), $recipient->getName());
+        }
+
+        foreach ($envelope->getBcc() as $recipient) {
+            $this->mailer->addBcc($recipient->getAddress(), $recipient->getName());
         }
 
         foreach ($envelope->getAttachments() as $attachment) {
@@ -56,22 +60,5 @@ class Localhost extends AbstractTransport
         }
 
         $this->mailer->send();
-/*
-        try {
-
-            if (!$this->mailer->send()) {
-                echo "FEHLER!";
-                print_r(error_get_last());
-                exit;
-            }
-
-        }
-        catch ( \Exception $e ) {
-            echo "FEHLER!";
-            p($e->getMessage());
-            p(error_get_last());
-            exit;
-        }
-*/
     }
 }
