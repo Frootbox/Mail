@@ -16,5 +16,5 @@ interface TransportInterface
     /**
      *
      */
-    public function setFrom(string $address, string $name = null): void;
+    public function setFrom(string $address, ?string $name = null): void;
 }

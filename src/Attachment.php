@@ -13,7 +13,7 @@ class Attachment
     /**
      *
      */
-    public function __construct(string $path, string $name = null)
+    public function __construct(string $path, ?string $name = null)
     {
         $this->path = $path;
 

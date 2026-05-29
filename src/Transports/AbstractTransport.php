@@ -45,7 +45,7 @@ abstract class AbstractTransport implements \Frootbox\Mail\Transports\Interfaces
     /**
      *
      */
-    public function setFrom(string $address, string $name = null): void
+    public function setFrom(string $address, ?string $name = null): void
     {
         $this->fromAddress = $address;
         $this->fromName = $name;

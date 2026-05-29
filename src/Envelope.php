@@ -25,7 +25,7 @@ class Envelope
     /**
      *
      */
-    public function addTo(string $address, string $name = null): void
+    public function addTo(string $address, ?string $name = null): void
     {
         $this->to[] = new Recipient($address, $name);
     }
@@ -33,7 +33,7 @@ class Envelope
     /**
      *
      */
-    public function addBcc(string $address, string $name = null): void
+    public function addBcc(string $address, ?string $name = null): void
     {
         $this->bcc[] = new Recipient($address, $name);
     }
@@ -131,7 +131,7 @@ class Envelope
     /**
      *
      */
-    public function setReplyTo(string $address = null, string $name = null): void
+    public function setReplyTo(?string $address = null, ?string $name = null): void
     {
         if ($address === null) {
             $this->replyTo = null;

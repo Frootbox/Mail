@@ -13,7 +13,7 @@ class Recipient
     /**
      *
      */
-    public function __construct(string $address, string $name = null)
+    public function __construct(string $address, ?string $name = null)
     {
         $this->name = $name;
         $this->address = $address;
