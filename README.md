@@ -136,6 +136,23 @@ $transport->send($envelope, [
 
 Images whose `src` already starts with `cid:` are skipped.
 
+## Archiving Sent Messages
+
+The built-in `Smtp` and `Localhost` transports keep the complete MIME source of the last sent message. This can be stored as an `.eml` file for audits, customer support, or external documentation.
+
+```php
+$transport = new Smtp($config);
+$transport->send($envelope);
+
+$mimeMessage = $transport->getLastMimeMessage();
+
+if ($mimeMessage !== null) {
+    file_put_contents(__DIR__ . '/archive/welcome.eml', $mimeMessage);
+}
+```
+
+The MIME message is generated from PHPMailer immediately before delivery, so it includes headers, recipients, the rendered HTML body, embedded images, and attachments. `getLastMimeMessage()` returns `null` before the first successful send or when a custom transport does not support MIME archiving.
+
 ## Envelope API
 
 Common methods:
@@ -178,6 +195,8 @@ final class LogTransport implements TransportInterface
     }
 }
 ```
+
+If a custom transport can expose the raw MIME source of the last sent message, it should also implement `Frootbox\Mail\Transports\Interfaces\MimeMessageAwareTransportInterface`.
 
 ## License
 
