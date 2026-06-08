@@ -5,10 +5,11 @@
 
 namespace Frootbox\Mail\Transports;
 
-abstract class AbstractTransport implements \Frootbox\Mail\Transports\Interfaces\TransportInterface
+abstract class AbstractTransport implements \Frootbox\Mail\Transports\Interfaces\TransportInterface, \Frootbox\Mail\Transports\Interfaces\MimeMessageAwareTransportInterface
 {
     protected ?string $fromAddress = null;
     protected ?string $fromName = null;
+    protected ?string $lastMimeMessage = null;
 
     /**
      *
@@ -40,6 +41,14 @@ abstract class AbstractTransport implements \Frootbox\Mail\Transports\Interfaces
         }
 
         return $this->config->get('mail.defaults.from.name');
+    }
+
+    /**
+     *
+     */
+    public function getLastMimeMessage(): ?string
+    {
+        return $this->lastMimeMessage;
     }
 
     /**

@@ -27,6 +27,8 @@ class Smtp extends AbstractTransport
      */
     public function send(\Frootbox\Mail\Envelope $envelope, array $parameters = []): void
     {
+        $this->lastMimeMessage = null;
+
         if (!empty($this->overrideSettings)) {
 
             $this->mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
@@ -195,7 +197,9 @@ class Smtp extends AbstractTransport
                 $this->mailer->addAttachment($attachment->getPath(), $attachment->getName());
             }
 
-            $this->mailer->send();
+            $this->mailer->preSend();
+            $this->lastMimeMessage = $this->mailer->getSentMIMEMessage();
+            $this->mailer->postSend();
         }
         finally {
             foreach ($tempFiles as $tempFile) {
